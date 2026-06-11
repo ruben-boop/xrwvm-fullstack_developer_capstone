@@ -62,7 +62,7 @@ app.get('/fetchDealers', async (req, res) => {
         const documents = await Dealerships.find();
         res.json(documents);
     } catch(error){
-        res.status(500)express.json({Error fetching documents});
+        res.status(500).json({error: 'Error fetching documents'});
     }
 });
 
@@ -72,7 +72,7 @@ app.get('/fetchDealers/:state', async (req, res) => {
         const documents = await Dealerships.find({state: req.params.state});
         res.json(documents);
     } catch(error){
-        res.status(500)express.json({Error fetching documents});
+        res.status(500).json({error: 'Error fetching documents'});
     }
 });
 
@@ -82,7 +82,7 @@ app.get('/fetchDealer/:id', async (req, res) => {
         const documents = await Dealerships.find({id:req.params.id});
         res.json(documents);
     } catch(error){
-        res.status(500)express.json({Error fetching documents});
+        res.status(500).json({error: 'Error fetching documents'});
     }
 });
 
@@ -112,7 +112,6 @@ app.post('/insert_review', express.raw({ type: '*/*' }), async (req, res) => {
     res.status(500).json({ error: 'Error inserting review' });
   }
 });
-
 // Start the Express server
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
