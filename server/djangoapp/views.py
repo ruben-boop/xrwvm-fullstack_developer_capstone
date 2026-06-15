@@ -53,7 +53,8 @@ def logout_request(request):
 @csrf_exempt
 def registration(request):
     # Get user data from request form
-    # context = {}
+    context = {}
+    
     data = json.loads(request.body)
     username = data['userName']
     password = data['password']
