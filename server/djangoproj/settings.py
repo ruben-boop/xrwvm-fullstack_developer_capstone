@@ -157,4 +157,3 @@ STATICFILES_DIRS = [
     BASE_DIR / "frontend" / "build",
     BASE_DIR / "frontend" / "build" / "static",
 ]
-
