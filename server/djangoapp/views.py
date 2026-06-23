@@ -61,7 +61,6 @@ def registration(request):
     username_exist = False
 
     try:
-        # Check if user already exists
         User.objects.get(username=username)
         username_exist = True
     except User.DoesNotExist:
