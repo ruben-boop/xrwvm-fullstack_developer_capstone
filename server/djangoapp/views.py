@@ -66,5 +66,7 @@ def registration(request):
     except User.DoesNotExist:
         pass
     
-    # Complete the rest of your `registration` logic here
-    return JsonResponse({"userName": username, "user_exist": username_exist})
+    if not username_exist:
+        User.objects.create_user(username=username, password=password, 
+                             first_name=first_name, last_name=last_name, email=email)
+        return JsonResponse({"userName": username, "status": "Registered"})
