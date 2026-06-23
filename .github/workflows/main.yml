@@ -33,9 +33,9 @@ jobs:
       runs-on: ubuntu-latest
       steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v24
       - name: Install Node.js
-        uses: actions/setup-node@4
+        uses: actions/setup-node@24
         with:
           node-version: 14
       - name: Install JSHint
