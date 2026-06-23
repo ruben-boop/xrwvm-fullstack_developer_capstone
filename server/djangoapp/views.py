@@ -9,7 +9,12 @@ from django.views.decorators.csrf import csrf_exempt
 # Third-party or local app imports
 from .models import CarMake, CarModel  # noqa: F401
 from .populate import initiate  # noqa: F401
-from .restapis import analyze_review_sentiments, get_request, post_review  # noqa: F401
+from .restapis import (
+    analyze_review_sentiments,
+    get_request,
+    post_review,
+)
+
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
