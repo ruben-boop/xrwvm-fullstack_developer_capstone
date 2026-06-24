@@ -14,8 +14,9 @@ import logging
 import json
 from django.views.decorators.csrf import csrf_exempt
 from .populate import initiate
+from .populate_dealers import initiate_dealers
 
-from .models import CarMake, CarModel
+from .models import CarMake, CarModel, Dealer
 from .restapis import get_request, analyze_review_sentiments, post_review
 
 # Get an instance of a logger
@@ -93,25 +94,37 @@ def registration(request):
 # # Update the `get_dealerships` view to render the index page with
 # a list of dealerships
 def get_dealerships(request, state="All"):
-    if state == "All":
-        endpoint = "/fetchDealers"
-    else:
-        endpoint = "/fetchDealers/" + state
-    dealerships = get_request(endpoint)
-    return JsonResponse({"status": 200, "dealers": dealerships})
+    """
+    Get all dealers or dealers filtered by state.
+    Queries the Django Dealer model directly.
+    """
+    try:
+        if state == "All":
+            endpoint = "/fetchDealers"
+        else:
+            endpoint = "/fetchDealers/" + state
+        dealerships = get_request(endpoint)
+        return JsonResponse({"status": 200, "dealers": dealerships})
+    except Exception as e:
+        logger.error(f"Error fetching dealerships: {e}")
+        return JsonResponse({"status": 400, "message": "Error fetching dealerships"})
 
 
 # Create a `get_dealer_reviews` view to render the reviews of a dealer
 def get_dealer_reviews(request, dealer_id):
     # if dealer id has been provided
     if dealer_id:
-        endpoint = "/fetchReviews/dealer/" + str(dealer_id)
-        reviews = get_request(endpoint)
-        for review_detail in reviews:
-            response = analyze_review_sentiments(review_detail["review"])
-            print(response)
-            review_detail["sentiment"] = response["sentiment"]
-        return JsonResponse({"status": 200, "reviews": reviews})
+        try:
+            endpoint = "/fetchReviews/dealer/" + str(dealer_id)
+            reviews = get_request(endpoint)
+            for review_detail in reviews:
+                response = analyze_review_sentiments(review_detail["review"])
+                print(response)
+                review_detail["sentiment"] = response["sentiment"]
+            return JsonResponse({"status": 200, "reviews": reviews})
+        except Exception as e:
+            logger.error(f"Error fetching reviews: {e}")
+            return JsonResponse({"status": 400, "message": "Error fetching reviews"})
     else:
         return JsonResponse({"status": 400, "message": "Bad Request"})
 
@@ -119,9 +132,13 @@ def get_dealer_reviews(request, dealer_id):
 # `get_dealer_details` view to render the dealer details
 def get_dealer_details(request, dealer_id):
     if dealer_id:
-        endpoint = "/fetchDealer/" + str(dealer_id)
-        dealership = get_request(endpoint)
-        return JsonResponse({"status": 200, "dealer": dealership})
+        try:
+            endpoint = "/fetchDealer/" + str(dealer_id)
+            dealership = get_request(endpoint)
+            return JsonResponse({"status": 200, "dealer": dealership})
+        except Exception as e:
+            logger.error(f"Error fetching dealer details: {e}")
+            return JsonResponse({"status": 400, "message": "Error fetching dealer details"})
     else:
         return JsonResponse({"status": 400, "message": "Bad Request"})
 
@@ -134,7 +151,7 @@ def add_review(request):
             response = post_review(data)
             return JsonResponse({"status": 200, "message": response})
         except Exception as e:
-            return JsonResponse({"status": 401, "message": e})
+            return JsonResponse({"status": 401, "message": str(e)})
     else:
         return JsonResponse({"status": 403, "message": "Unauthorized"})
 
@@ -153,3 +170,16 @@ def get_cars(request):
             {"CarModel": car_model.name, "CarMake": car_model.car_make.name}
         )
     return JsonResponse({"CarModels": cars})
+
+
+def init_dealers(request):
+    """
+    Initialize dealers in the database.
+    Call this once to populate the database with sample dealer data.
+    """
+    try:
+        initiate_dealers()
+        return JsonResponse({"status": 200, "message": "Dealers initialized successfully"})
+    except Exception as e:
+        logger.error(f"Error initializing dealers: {e}")
+        return JsonResponse({"status": 400, "message": str(e)})
