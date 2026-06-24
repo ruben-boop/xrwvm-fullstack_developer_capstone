@@ -37,4 +37,6 @@ urlpatterns = [
         name="dealer_details",
     ),
     path(route="add_review", view=views.add_review, name="add_review"),
+    # Initialize dealer data
+    path(route="init_dealers", view=views.init_dealers, name="init_dealers"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
